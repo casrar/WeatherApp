@@ -17,16 +17,16 @@ def index(request):
     x = [latlon_list.append( # this is fairly stupid, needs to be changed
         geolocate(location.city_name, location.state_name, location.country_name)
         ) for location in locations_list]
-    print(latlon_list)
-    weather_list = []
+    weather_list = [] # this is fairly stupid, needs to be changed
     x = [weather_list.append(weather(latlon[0], latlon[1])) for latlon in latlon_list]
-    print(weather_list)
+    current_weather_list = []
+    x = [current_weather_list.append((weather['weather'][0] | weather['main'])) for weather in weather_list]
+    
     template = loader.get_template('homepage/index.html')
     context = {
         'weather_list': weather_list,
+        'current_weather_list': current_weather_list,
     }
-    #output = ''
-    #output = '\n'.join([output + location.__str__() for location in locations_list])
         
     return HttpResponse(template.render(context, request))
 
@@ -55,4 +55,4 @@ def weather(lat, lon):
     if (response.status_code != 200):
         return HttpResponse('Error')
 
-    return response.text
+    return response.json()
