@@ -20,7 +20,7 @@ def index(request):
     weather_list = [] # this is fairly stupid, needs to be changed
     x = [weather_list.append(weather(latlon[0], latlon[1])) for latlon in latlon_list]
     current_weather_list = []
-    x = [current_weather_list.append((weather['weather'][0] | weather['main'])) for weather in weather_list]
+    x = [current_weather_list.append(weather_detail_extractor(weather)) for weather in weather_list]
     
     template = loader.get_template('homepage/index.html')
     context = {
@@ -56,3 +56,6 @@ def weather(lat, lon):
         return HttpResponse('Error')
 
     return response.json()
+
+def weather_detail_extractor(current_weather):
+    return current_weather['weather'][0] | current_weather['main']
