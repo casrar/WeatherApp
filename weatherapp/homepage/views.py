@@ -25,14 +25,14 @@ def index(request):
     x = [current_weather_list.append(weather_detail_extractor(weather)) for weather in weather_list]
     
     template = loader.get_template('homepage/index.html')
-    context = {
+    context = { # Get rid of redundancy here
         'weather_list': weather_list,
         'current_weather_list': current_weather_list,
     }
         
     return HttpResponse(template.render(context, request))
 
-def location(request, city, state, country): #figure out default argument for state
+def location(request, city, state, country): # Figure out default argument for state (not every country has states)
     lat, lon = geolocate(city, state, country)
     current_weather = weather(lat,lon)
     current_weather = weather_detail_extractor(current_weather)
@@ -45,6 +45,7 @@ def location(request, city, state, country): #figure out default argument for st
     return HttpResponse(template.render(context, request))
 
 # HELPER METHODS # 
+# Separate these from views.py, create file for helpers
 def geolocate(city, state, country):
     response = requests.get('http://api.openweathermap.org/geo/1.0/direct?q='+ city 
         +','+ state 
