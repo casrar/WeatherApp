@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotAllowed
+from django.core.exceptions import BadRequest
 from django.template import loader
 from dotenv import dotenv_values
 import requests
@@ -7,7 +8,7 @@ import requests
 from .models import Location
 
 #CONSTANTS
-LIMIT = '5'
+LIMIT = '1'
 CONFIG = dotenv_values(".env")
 
 # Create your views here.
@@ -32,12 +33,18 @@ def index(request):
         
     return HttpResponse(template.render(context, request))
 
-def detail(request, city, state, country): # Figure out default argument for state (not every country has states)
-    lat, lon = geolocate(city, state, country)
-    current_weather = weather(lat,lon)
-    current_weather = weather_detail_extractor(current_weather)
+def detail(request): 
+    city = request.GET['city']
+    state = request.GET['state']
+    country = request.GET['country']
 
-    print(current_weather)
+    try:
+        lat, lon = geolocate(city, state, country)
+        current_weather = weather(lat,lon)
+        current_weather = weather_detail_extractor(current_weather)
+    except:
+        return HttpResponse('error')
+
     template = loader.get_template('weather/search.html')
     context = {
         'current_weather': current_weather,
@@ -55,9 +62,9 @@ def geolocate(city, state, country):
 
     if (response.status_code != 200):
         return HttpResponse('Error')
-    
-    response_json = response.json()
-    return (response_json[0]['lat'], response_json[0]['lon'])
+
+    response = response.json()
+    return (response[0]['lat'], response[0]['lon'])
 
 def weather(lat, lon):
     response = requests.get('https://api.openweathermap.org/data/2.5/weather?lat='+ str(lat) 
@@ -70,4 +77,5 @@ def weather(lat, lon):
     return response.json()
 
 def weather_detail_extractor(current_weather):
-    return current_weather['weather'][0] | current_weather['main']
+    return current_weather['weather'][0] | current_weather['main'] | {
+        'country':current_weather['sys']['country']} | {'name':current_weather['name']}

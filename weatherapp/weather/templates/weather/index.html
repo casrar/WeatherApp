@@ -1,5 +1,13 @@
 <!DOCTYPE html>
 <html lang="en-US">
+    <form action="{% url 'weather:detail' %}" method ="GET">
+    {% csrf_token %}
+        <input type="text" name="city" value="city">
+        <input type="text" name="state" value="state">
+        <input type="text" name="country" value="country">
+
+        <input type="submit" name="send">
+    </form>
     {% if current_weather_list %}
         <ul>
         {% for weather in current_weather_list %}
