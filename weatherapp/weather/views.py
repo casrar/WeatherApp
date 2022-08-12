@@ -24,7 +24,7 @@ def index(request):
     current_weather_list = []
     x = [current_weather_list.append(weather_detail_extractor(weather)) for weather in weather_list]
     
-    template = loader.get_template('homepage/index.html')
+    template = loader.get_template('weather/index.html')
     context = { # Get rid of redundancy here
         'weather_list': weather_list,
         'current_weather_list': current_weather_list,
@@ -32,13 +32,13 @@ def index(request):
         
     return HttpResponse(template.render(context, request))
 
-def location(request, city, state, country): # Figure out default argument for state (not every country has states)
+def detail(request, city, state, country): # Figure out default argument for state (not every country has states)
     lat, lon = geolocate(city, state, country)
     current_weather = weather(lat,lon)
     current_weather = weather_detail_extractor(current_weather)
 
     print(current_weather)
-    template = loader.get_template('homepage/search.html')
+    template = loader.get_template('weather/search.html')
     context = {
         'current_weather': current_weather,
     }
