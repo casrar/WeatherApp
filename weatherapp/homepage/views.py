@@ -11,8 +11,10 @@ LIMIT = '5'
 CONFIG = dotenv_values(".env")
 
 # Create your views here.
+# VIEWS #
 def index(request):
     locations_list = list(Location.objects.all())
+
     latlon_list = []
     x = [latlon_list.append( # this is fairly stupid, needs to be changed
         geolocate(location.city_name, location.state_name, location.country_name)
@@ -32,8 +34,17 @@ def index(request):
 
 def location(request, city, state, country): #figure out default argument for state
     lat, lon = geolocate(city, state, country)
-    return HttpResponse(weather(lat, lon))
+    current_weather = weather(lat,lon)
+    current_weather = weather_detail_extractor(current_weather)
 
+    print(current_weather)
+    template = loader.get_template('homepage/search.html')
+    context = {
+        'current_weather': current_weather,
+    }
+    return HttpResponse(template.render(context, request))
+
+# HELPER METHODS # 
 def geolocate(city, state, country):
     response = requests.get('http://api.openweathermap.org/geo/1.0/direct?q='+ city 
         +','+ state 
