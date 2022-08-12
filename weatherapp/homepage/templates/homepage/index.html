@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    {% if weather_list %}
+        <ul>
+        {% for weather in weather_list %}
+        <body>
+            <p>{{weather}}</p>
+          </body>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No locations are available.</p>
+    {% endif %} 
+</html>
